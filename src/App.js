@@ -1,31 +1,58 @@
+import { useState } from "react";
+
 function App() {
-  const tip = 0;
-  const bill = 0;
   return (
     <div>
-      <BillInput />
-      <SelectPercentage />
-      <SelectPercentage />
-      <Output tip={tip} bill={bill} />
+      <TipCalculator />
+    </div>
+  );
+}
+
+function TipCalculator() {
+  const [bill, setBill] = useState(0);
+  const [percentage1, setPercentage1] = useState(0);
+  const [percentage2, setPercentage2] = useState(0);
+
+  const tip = (bill * (percentage1 + percentage2)) / 2 / 100;
+
+  return (
+    <div>
+      <BillInput bill={bill} onSetBill={setBill} />
+
+      <SelectPercentage percentage={percentage1} onSelect={setPercentage1}>
+        How did you like the service?
+      </SelectPercentage>
+
+      <SelectPercentage percentage={percentage2} onSelect={setPercentage2}>
+        How did your friend like the service?
+      </SelectPercentage>
+
+      <Output bill={bill} tip={tip} />
+
       <Reset />
     </div>
   );
 }
 
-function BillInput() {
+function BillInput({ bill, onSetBill }) {
   return (
     <div>
       <label htmlFor="bill">How much was the bill?</label>
-      <input type="number" placeholder="Bill value" />
+      <input
+        type="text"
+        placeholder="Bill value"
+        value={bill}
+        onChange={(e) => onSetBill(Number(e.target.value))}
+      />
     </div>
   );
 }
 
-function SelectPercentage() {
+function SelectPercentage({ children, percentage, onSelect }) {
   return (
     <div>
-      <label htmlFor="service">How did you like the service?</label>
-      <select id="service">
+      <label htmlFor="service">{children}</label>
+      <select id="service" onChange={(e) => onSelect(Number(e.target.value))}>
         <option value={0}>Dissatisfied(0%)</option>
         <option value={5}>It was OK(5%)</option>
         <option value={10}>It was good(10%)</option>
@@ -36,7 +63,7 @@ function SelectPercentage() {
 }
 
 function Output({ tip, bill }) {
-  return <div>{`You pay $${tip + bill}: $${bill} + $${tip}`}</div>;
+  return <div>{`You pay $${tip + bill} ($${bill} + $${Number(tip)} tip`}</div>;
 }
 
 function Reset() {
